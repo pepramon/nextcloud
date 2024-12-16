@@ -48,6 +48,8 @@ echo "Iniciando NextCloud..."
 NC_PID=$!
 
 # Se configura una espera para ejecutar el cron
+# Define un valor por defecto si no está definido TIEMPO_ESPERA de 5 minutos
+TIEMPO_ESPERA=${TIEMPO_ESPERA:-300}
 if [ -n "$TIEMPO_ESPERA" ]; then
     while true; do
         echo "Ejecutando Cron y esperando $TIEMPO_ESPERA"
