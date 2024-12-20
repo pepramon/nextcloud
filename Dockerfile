@@ -8,10 +8,9 @@ COPY script_inicio.sh /script_inicio.sh
 RUN chmod +x /script_inicio.sh && \
     apt-get update && \
     apt-get -y upgrade && \
-    apt autoremove -y && \
-    apt clean && \
+    apt-get autoremove -y && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/* 
 
 # Definir el script como entrypoint
 ENTRYPOINT ["/script_inicio.sh"]
-CMD ["apache2-foreground"]
