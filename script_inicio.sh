@@ -25,6 +25,7 @@ salida_limpia() {
 # TERM, INT: Señales para detener el script de forma controlada (por ejemplo, Docker o Ctrl+C)
 # QUIT: Señal adicional de interrupción, útil en algunos sistemas
 # EXIT: Ejecuta la función `salida_limpia` para garantizar que los procesos se detengan correctamente
+# SIGWINCH: Es la señal que se manda al contenedor para apagarlo. Configuración de nextcloud
 trap "salida_limpia" EXIT SIGINT SIGTERM SIGQUIT SIGHUP SIGUSR1 SIGUSR2 SIGWINCH
 
 # Si se suministra un UID, se hace que apache de Nextcloud se ejecute con ese usuario
@@ -42,14 +43,12 @@ if [ -n "$NEXTCLOUD_DATA_DIR" ]; then
     chown -R www-data:www-data "$NEXTCLOUD_DATA_DIR"
 fi
 
-# Se lanza nginx con sus parámetros y se guarda el PID
+# Se lanza nextcloud con sus parámetros y se guarda el PID
 echo "Iniciando NextCloud..."
 /entrypoint.sh "$@" &
 NC_PID=$!
 
 # Se configura una espera para ejecutar el cron
-# Define un valor por defecto si no está definido TIEMPO_ESPERA de 5 minutos
-TIEMPO_ESPERA=${TIEMPO_ESPERA:-300}
 if [ -n "$TIEMPO_ESPERA" ]; then
     while true; do
         echo "Ejecutando Cron y esperando $TIEMPO_ESPERA"
