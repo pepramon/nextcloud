@@ -1,22 +1,22 @@
-#!/bin/bash
+#!/bin/bash -i
 
 # Función para manejar una salida limpia del script
 salida_limpia() {
     echo "Iniciando proceso de apagado..."
-    
+
     # Detener cron
     if [ -n "$CRON_PID" ]; then
         kill -SIGTERM "$CRON_PID" 2>/dev/null
         wait "$CRON_PID" 2>/dev/null
     fi
-    
+
     # Detener el proceso de Nextcloud
     if kill -0 "$NC_PID" 2>/dev/null; then
         echo "Deteniendo NextCloud..."
-        kill -SIGTERM "$NC_PID"
+        kill -SIGWINCH "$NC_PID"
         wait "$NC_PID"
     fi
-    
+
     echo "Apagado completo."
     exit
 }
@@ -25,7 +25,7 @@ salida_limpia() {
 # TERM, INT: Señales para detener el script de forma controlada (por ejemplo, Docker o Ctrl+C)
 # QUIT: Señal adicional de interrupción, útil en algunos sistemas
 # EXIT: Ejecuta la función `salida_limpia` para garantizar que los procesos se detengan correctamente
-trap "salida_limpia" EXIT SIGINT SIGTERM
+trap "salida_limpia" EXIT SIGINT SIGTERM SIGQUIT SIGHUP SIGUSR1 SIGUSR2 SIGWINCH
 
 # Si se suministra un UID, se hace que apache de Nextcloud se ejecute con ese usuario
 if [ -n "$UID" ]; then
@@ -53,8 +53,8 @@ TIEMPO_ESPERA=${TIEMPO_ESPERA:-300}
 if [ -n "$TIEMPO_ESPERA" ]; then
     while true; do
         echo "Ejecutando Cron y esperando $TIEMPO_ESPERA"
-        su -s /bin/bash -c "php -f /var/www/html/cron.php" www-data
         sleep "$TIEMPO_ESPERA"
+        su -s /bin/bash -c "php -f /var/www/html/cron.php" www-data
     done &
     CRON_PID=$!
 fi
