@@ -14,3 +14,4 @@ RUN chmod +x /script_inicio.sh && \
 
 # Definir el script como entrypoint
 ENTRYPOINT ["/script_inicio.sh"]
+CMD ["apache2-foreground"]
